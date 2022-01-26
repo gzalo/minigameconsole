@@ -1,5 +1,11 @@
 #include <at89x52.h>
 
+// Combinaciones que se prenden en cada boton (para acceso por polling)
+#define BTN_UP (!P3_4)
+#define BTN_DOWN (!P3_2)
+#define BTN_LEFT (!P3_5)
+#define BTN_RIGHT (!P3_3)
+
 #include "ledmatrix.c"
 #include "sound.c"
 #include "gamelogic.c"

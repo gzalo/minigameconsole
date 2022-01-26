@@ -1,13 +1,11 @@
-// Combinaciones que se prenden en cada boton (para acceso por polling)
-#define BTN_UP (!P3_4)
-#define BTN_DOWN (!P3_2)
-#define BTN_LEFT (!P3_5)
-#define BTN_RIGHT (!P3_3)
-
 // Tiempo cada cuanto se ejecuta la logica de juegos
 #define GAMELOGIC_US 20000
 // Cantidad de juegos
-#define AMOUNT_GAMES 5
+#ifdef TV_MODE
+	#define AMOUNT_GAMES 3
+#else
+	#define AMOUNT_GAMES 5
+#endif
 
 // Estados posibles de la maquina de estados
 enum
@@ -24,14 +22,16 @@ enum
 // Posicion X, Y, juego seleccionado, estado actual, numero aleatorio
 unsigned char posX,posY,game=0,state=STATE_LIST,randomNumber = 0;
 
+#ifndef TV_MODE
 // SNAKE
 unsigned char fruitX, fruitY;
 __idata __at (0x80) unsigned char snakePosX[64];
 __idata __at (0xC0) unsigned char snakePosY[64];
 unsigned char snakeLen;
-
 unsigned char keyAffects = 0;
 char vX=1, vY=0;
+#endif
+
 // Cantidad de veces que es ejecutó la lógica
 unsigned short loop = 0;
 // Puntaje del juego
@@ -58,6 +58,7 @@ __code const unsigned char fuente[10*5] =
 	0b00000010,0b00000101,0b00000111,0b00000001,0b00000110, //Nueve
 };
 
+#ifndef TV_MODE
 void leftIsr() __interrupt(IE0_VECTOR) __using(0)
 {
 	randomNumber = TL0;
@@ -66,6 +67,7 @@ void upIsr() __interrupt(IE1_VECTOR) __using(0)
 {
 	randomNumber = TL0;
 }
+#endif
 
 // Devuelve un numero pseudo-aleatorio de 8 bits (cuidado, se hace deducible)
 unsigned char getRandomNumber()
@@ -81,17 +83,17 @@ void gameOver(){
 	matrixClearAll();
 	num1 = score/10;
 	num2 = score%10;
-	matrixData[0] = fuente[num2*5];
-	matrixData[1] = fuente[num2*5+1];
-	matrixData[2] = fuente[num2*5+2];
-	matrixData[3] = fuente[num2*5+3];
-	matrixData[4] = fuente[num2*5+4];
+	matrixSetRow(0, fuente[num2*5]);
+	matrixSetRow(1, fuente[num2*5+1]);
+	matrixSetRow(2, fuente[num2*5+2]);
+	matrixSetRow(3, fuente[num2*5+3]);
+	matrixSetRow(4, fuente[num2*5+4]);
 	
-	matrixData[0] |= fuente[num1*5]<<4;
-	matrixData[1] |= fuente[num1*5+1]<<4;
-	matrixData[2] |= fuente[num1*5+2]<<4;
-	matrixData[3] |= fuente[num1*5+3]<<4;
-	matrixData[4] |= fuente[num1*5+4]<<4;
+	matrixOrRow(0, fuente[num1*5]<<4);
+	matrixOrRow(1, fuente[num1*5+1]<<4);
+	matrixOrRow(2, fuente[num1*5+2]<<4);
+	matrixOrRow(3, fuente[num1*5+3]<<4);
+	matrixOrRow(4, fuente[num1*5+4]<<4);
 	
 	// Quedamos esperando teclas
 	state = STATE_GAMEOVER;
@@ -104,54 +106,54 @@ void gameList()
 	switch(game)
 	{
 		case 0:
-			matrixData[0] = 0b01110111;
-			matrixData[1] = 0b00100100;
-			matrixData[2] = 0b00100111;
-			matrixData[3] = 0b00100100;
-			matrixData[4] = 0b00100111;
-			matrixData[5] = 0b00000000;
-			matrixData[6] = 0b00000000;
-			matrixData[7] = 0b00000000;
+			matrixSetRow(0,  0b01110111);
+			matrixSetRow(1,  0b00100100);
+			matrixSetRow(2,  0b00100111);
+			matrixSetRow(3,  0b00100100);
+			matrixSetRow(4,  0b00100111);
+			matrixSetRow(5,  0b00000000);
+			matrixSetRow(6,  0b00000000);
+			matrixSetRow(7,  0b00000000);
 			break;
 		case 1:
-			matrixData[0] = 0b01110101;
-			matrixData[1] = 0b01010101;
-			matrixData[2] = 0b01110101;
-			matrixData[3] = 0b01010101;
-			matrixData[4] = 0b01010111;
-			matrixData[5] = 0b00000000;
-			matrixData[6] = 0b00000000;
-			matrixData[7] = 0b00000000;					
+			matrixSetRow(0,  0b01110101);
+			matrixSetRow(1,  0b01010101);
+			matrixSetRow(2,  0b01110101);
+			matrixSetRow(3,  0b01010101);
+			matrixSetRow(4,  0b01010111);
+			matrixSetRow(5,  0b00000000);
+			matrixSetRow(6,  0b00000000);
+			matrixSetRow(7,  0b00000000);					
 			break;
 		case 2:
-			matrixData[0] = 0b01110101;
-			matrixData[1] = 0b01000101;
-			matrixData[2] = 0b01000111;
-			matrixData[3] = 0b01000101;
-			matrixData[4] = 0b01110101;
-			matrixData[5] = 0b00000000;
-			matrixData[6] = 0b00000000;
-			matrixData[7] = 0b00000000;					
+			matrixSetRow(0,  0b01110101);
+			matrixSetRow(1,  0b01000101);
+			matrixSetRow(2,  0b01000111);
+			matrixSetRow(3,  0b01000101);
+			matrixSetRow(4,  0b01110101);
+			matrixSetRow(5,  0b00000000);
+			matrixSetRow(6,  0b00000000);
+			matrixSetRow(7,  0b00000000);					
 			break;
 		case 3:
-			matrixData[0] = 0b11101001;
-			matrixData[1] = 0b10001101;
-			matrixData[2] = 0b11101011;
-			matrixData[3] = 0b00101001;
-			matrixData[4] = 0b11101001;
-			matrixData[5] = 0b00000000;
-			matrixData[6] = 0b00000000;
-			matrixData[7] = 0b00000000;									
+			matrixSetRow(0,  0b11101001);
+			matrixSetRow(1,  0b10001101);
+			matrixSetRow(2,  0b11101011);
+			matrixSetRow(3,  0b00101001);
+			matrixSetRow(4,  0b11101001);
+			matrixSetRow(5,  0b00000000);
+			matrixSetRow(6,  0b00000000);
+			matrixSetRow(7,  0b00000000);									
 			break;
 		case 4:
-			matrixData[0] = 0b11101001;
-			matrixData[1] = 0b10001001;
-			matrixData[2] = 0b11101001;
-			matrixData[3] = 0b10101001;
-			matrixData[4] = 0b11101111;
-			matrixData[5] = 0b00000000;
-			matrixData[6] = 0b00000000;
-			matrixData[7] = 0b00000000;									
+			matrixSetRow(0,  0b11101001);
+			matrixSetRow(1,  0b10001001);
+			matrixSetRow(2,  0b11101001);
+			matrixSetRow(3,  0b10101001);
+			matrixSetRow(4,  0b11101111);
+			matrixSetRow(5,  0b00000000);
+			matrixSetRow(6,  0b00000000);
+			matrixSetRow(7,  0b00000000);									
 			break;
 	}
 	if(BTN_LEFT)
@@ -189,7 +191,7 @@ void gameList()
 				state = STATE_CAR;
 				posX = 3;
 				posY = 7;
-				matrixData[0] = 0b11100011;
+				matrixSetRow(0,  0b11100011);
 				break;
 			case 2:
 				matrixClearAll();
@@ -197,6 +199,7 @@ void gameList()
 				posX = 0;
 				posY = 3;
 				break;					
+			#ifndef TV_MODE
 			case 3:
 				matrixClearAll();
 				state = STATE_SNAKE;
@@ -209,6 +212,7 @@ void gameList()
 				matrixClearAll();
 				state = STATE_GUITAR;
 				break;
+			#endif
 		}
 	}
 }
@@ -263,11 +267,11 @@ void gameTetris(){
 			matrixSet(posX, posY);
 			
 			// Si la ultima fila está llena
-			if(matrixData[7] == 0xFF)
+			if(matrixGetRow(7) == 0xFF)
 			{
 				// Movemos todo uno para abajo, limpiamos la primer linea y aumentamos el puntaje
-				for(i=7;i>0;i--) matrixData[i] = matrixData[i-1];
-				matrixData[0] = 0;
+				for(i=7;i>0;i--) matrixSetRow(i, matrixGetRow(i-1));
+				matrixSetRow(0, 0);
 				score++;
 			}
 			
@@ -280,6 +284,7 @@ void gameTetris(){
 		if(matrixColPut(1, posX, posY)) return gameOver();
 	}
 	
+	#ifndef TV_MODE
 	// Cada 400 ms
 	if(loop%10 == 0){
 		if(timing[currentNote] == ' '){
@@ -297,6 +302,7 @@ void gameTetris(){
 			currentNote%=78;					
 		}
 	}	
+	#endif
 }
 
 void gameCar()
@@ -338,24 +344,24 @@ void gameCar()
 		// 1 de cada 10 ticks, 
 		
 		// Muevo todo una fila para abajo
-		for(i=7;i>0;i--) matrixData[i] = matrixData[i-1];
+		for(i=7;i>0;i--) matrixSetRow(i, matrixGetRow(i-1));
 		
 		// Si al pintar el auto ya había algo abajo, el juego está terminado
 		if(matrixColPut(1, posX, posY)) return gameOver();		
 		
 		// Si la primer columna no está encendida,
-		if(!(matrixData[1] & 0x80))
+		if(!(matrixGetRow(1) & 0x80))
 		{
 			// La primera fila es la segunda corrida una a la derecha
-			matrixData[0] = (matrixData[1] >> 1) | 0x80; 			
+			matrixSetRow(0,  (matrixGetRow(1) >> 1) | 0x80);	
 		}
 		else
 		{
 			// Si la ultima columna no está encendida
-			if(!(matrixData[1] & 0x01))
+			if(!(matrixGetRow(1) & 0x01))
 			{
 				// La primera fila es la segunda corrida uno a la izquierda
-				matrixData[0] = (matrixData[1] << 1) | 1; 			
+				matrixSetRow(0,  (matrixGetRow(1) << 1) | 1); 			
 			}
 			else
 			{
@@ -363,11 +369,11 @@ void gameCar()
 				
 				if(getRandomNumber()&0x80)
 				{
-					matrixData[0] = (matrixData[1] << 1) | 1; 			
+					matrixSetRow(0,  (matrixGetRow(1) << 1) | 1); 			
 				}
 				else
 				{
-					matrixData[0] = (matrixData[1] >> 1) | 0x80; 
+					matrixSetRow(0,  (matrixGetRow(1) >> 1) | 0x80); 
 				}
 			}
 		}
@@ -399,42 +405,42 @@ void gameChopper()
 	if(loop%15 == 0)
 	{
 		// Cada 15 ticks, muevo todo
-		for(i=0;i<8;i++) matrixData[i] <<=1;
+		for(i=0;i<8;i++) matrixSetRow(i, matrixGetRow(i) << 1);
 		
 		// Algunos patterns aleatorios
 		
 		switch(getRandomNumber()%10)
 		{
 			case 0:
-				matrixData[3] |=1;
-				matrixData[4] |=1;
+				matrixOrRow(3, 1);
+				matrixOrRow(4, 1);
 				break;
 			case 1:
-				matrixData[4] |=1;
-				matrixData[5] |=1;
+				matrixOrRow(4, 1);
+				matrixOrRow(5, 1);
 				break;
 			case 2:
-				matrixData[1] |=1;
-				matrixData[2] |=1;
+				matrixOrRow(1, 1);
+				matrixOrRow(2, 1);
 				break;
 			case 3:
-				matrixData[1] |=1;
-				matrixData[3] |=1;
+				matrixOrRow(1, 1);
+				matrixOrRow(3, 1);
 				break;
 			case 4:
-				matrixData[0] |=1;
-				matrixData[4] |=1;
+				matrixOrRow(0, 1);
+				matrixOrRow(4, 1);
 				break;
 			case 5:
-				matrixData[6] |=1;
-				matrixData[5] |=1;
+				matrixOrRow(6, 1);
+				matrixOrRow(5, 1);
 				break;
 			default:
 				break;
 		}
 		
 		// La ultima fila está siempre encendida			
-		matrixData[7] = 0xFF;
+		matrixSetRow(7,  0xFF);
 		
 		// Apago el pixel a la izquierda del actual (estela después
 		// de mover todo a la izq)
@@ -451,6 +457,7 @@ void gameChopper()
 	}
 }
 
+#ifndef TV_MODE
 void gameSnake()
 {
 	char i;
@@ -537,6 +544,7 @@ void gameGuitar()
 		}
 	}	
 }
+#endif
 
 void gameLogic() __interrupt(TF1_VECTOR) __using(0)
 {
@@ -550,16 +558,21 @@ void gameLogic() __interrupt(TF1_VECTOR) __using(0)
 		gameCar();
 	}else if(state == STATE_CHOPPER){
 		gameChopper();
-	}else if(state == STATE_SNAKE){
+	}
+	#ifndef TV_MODE
+	else if(state == STATE_SNAKE){
 		gameSnake();
 	}else if(state == STATE_GUITAR){
 		gameGuitar();
 	}
+	#endif
 	
 	// Incrementamos el contador de veces que se ejecutó esta función
 	loop++;
 	
+	#ifndef TV_MODE
 	// Reseteamos el valor del timer	
 	TL1 = (0xFFFF-GAMELOGIC_US) & 0xFF;
 	TH1 = (0xFFFF-GAMELOGIC_US) >> 8; 
+	#endif
 } 

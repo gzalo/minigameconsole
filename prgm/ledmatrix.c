@@ -88,6 +88,21 @@ unsigned char matrixGet(unsigned char x, unsigned char y)
 	return matrixData[y] & (1<<(7-x));
 }
 
+// Settea el valor de una fila
+void matrixSetRow(unsigned char y, unsigned char value){
+	matrixData[y] = value;
+}
+
+// Orea el valor actual de una fila con otro
+void matrixOrRow(unsigned char y, unsigned char value){
+	matrixData[y] |= value;
+}
+
+// Devuelve el valor de una fila
+unsigned char matrixGetRow(unsigned char y){
+	return matrixData[y];
+}
+
 // Apaga o prende (dependiendo de value) un pixel, devuelve el valor en el que estaba antes
 unsigned char matrixColPut(unsigned char value, unsigned int x, unsigned int y)
 {
