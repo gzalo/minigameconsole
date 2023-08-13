@@ -3,13 +3,13 @@
 #define BitColor P3_0
 
 __idata __at(0x80) unsigned char frameBuffer[30*4];
-unsigned char line=0,i,j,k;
+unsigned char line=0;
 
 __bit bit00, bit01, bit02, bit03, bit04, bit05, bit06, bit07, 
 	  bit08, bit09, bit10, bit11, bit12, bit13, bit14, bit15, 
 	  bit16, bit17, bit18, bit19, bit20, bit21, bit22, bit23, 
 	  bit24, bit25, bit26, bit27, bit28, bit29, bit30, bit31,
-	  newFrame, lineHigh;
+	  lineHigh;
 unsigned char __at(0x20) currentByte[4];
 
 #define tvMatrixData(x) frameBuffer[(x)*4+9] 
@@ -84,5 +84,5 @@ void tvInit(){
 	unsigned char i;
 	frameBuffer[0] = frameBuffer[1] = frameBuffer[2] = frameBuffer[3] = 0x00;
 	frameBuffer[116] = frameBuffer[117] = frameBuffer[118] = frameBuffer[119] = 0x00;
-	for(i=4;i<116;i+=4) frameBuffer[i] = 0x7F,frameBuffer[i+1] = 0xFF, frameBuffer[i+2] = 0xFF, frameBuffer[i+3] = 0xF8;
+	for(i=4;i<116;i+=4) frameBuffer[i] = 0x7F,frameBuffer[i+1] = 0xFF, frameBuffer[i+2] = 0xFF, frameBuffer[i+3] = 0xEF;
 }
